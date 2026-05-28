@@ -1,0 +1,61 @@
+name: CI · ML
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint Python + Notebooks
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Instalar ruff + nbqa
+        run: pip install ruff nbqa
+
+      - name: Ruff em .py (warning)
+        continue-on-error: true
+        run: |
+          if compgen -G "**/*.py" > /dev/null; then
+            ruff check . --output-format=github
+          else
+            echo "::notice::sem arquivos .py ainda"
+          fi
+
+      - name: Ruff em notebooks via nbqa (warning)
+        continue-on-error: true
+        run: |
+          if compgen -G "**/*.ipynb" > /dev/null; then
+            nbqa ruff . --output-format=github
+          else
+            echo "::notice::sem notebooks ainda"
+          fi
+
+      - name: Verificar requirements.txt válido
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install --dry-run -r requirements.txt
+          else
+            echo "::notice::sem requirements.txt"
+          fi
+
+      - name: Tamanho do CSV (avisa se >5MB)
+        continue-on-error: true
+        run: |
+          for f in $(find . -name "*.csv" 2>/dev/null); do
+            size=$(stat -c%s "$f")
+            if [ "$size" -gt 5242880 ]; then
+              echo "::warning file=$f::CSV grande ($((size/1024))KB) — considere git-lfs"
+            fi
+          done
