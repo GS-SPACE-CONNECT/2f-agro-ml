@@ -1,5 +1,8 @@
 # 🧠 2f-agro-ml
 
+Colab = https://colab.research.google.com/drive/1An7ZQ_cfi8rCoA63eyO26cX0nsLTw4uR?usp=sharing
+
+
 > Pipeline ML do 2F-AGRO — **Space Risk IA** aplicado à agricultura familiar.
 > Matéria: **IA / Machine Learning** (10 pts) · FIAP 3ES · GS 2026.1
 
